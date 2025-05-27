@@ -1,0 +1,60 @@
+services:
+  traefik:
+    container_name: "$COMPOSE_PROJECT_NAME--traefik"
+    image: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Bind this Traefik instance to the containers of this stack.
+      # Without doing so, two or more simultaneously running stacks
+      # are conflicting with one another network-wise.
+      - "--providers.docker.constraints=Label(`com.docker.compose.project`, `$COMPOSE_PROJECT_NAME`)"
+      - "--entrypoints.web.address=:$COMPOSE_APP_PORT"
+    ports:
+      - "$COMPOSE_APP_PORT:$COMPOSE_APP_PORT"
+    volumes:
+      - "${DOCKER_SOCKET_LOCATION:-/var/run/docker.sock}:/var/run/docker.sock:ro"
+
+  n8n:
+    container_name: "$COMPOSE_PROJECT_NAME--n8n"
+    image: docker.n8n.io/n8nio/n8n:1.95.3
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.strip-prefix-server.stripprefix.prefixes=/$N8N_URL_PREFIX"
+      - "traefik.http.routers.n8n.rule=PathPrefix(`/$N8N_URL_PREFIX`)"
+      - "traefik.http.routers.n8n.middlewares=strip-prefix-server"
+      - "traefik.http.routers.n8n.entrypoints=web"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+    environment:
+      N8N_PORT: 5678
+      N8N_PATH: "/$N8N_URL_PREFIX"
+      N8N_PROTOCOL: http
+      NODE_ENV: production
+      WEBHOOK_URL: "http://127.0.0.1:$COMPOSE_APP_PORT/$N8N_URL_PREFIX"
+      GENERIC_TIMEZONE: "$N8N_GENERIC_TIMEZONE"
+      N8N_RUNNERS_ENABLED: true
+      # Disable telemetry requests.
+      N8N_DIAGNOSTICS_ENABLED: false
+      # Prevent fetching onboarding prompts.
+      N8N_ONBOARDING_FLOW_DISABLED: true
+      # Disable the workflow templates that are obtained from n8n servers.
+      N8N_TEMPLATES_ENABLED: false
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: true
+      NODE_FUNCTION_ALLOW_BUILTIN: "*"
+      NODE_FUNCTION_ALLOW_EXTERNAL: "*"
+      # Used to generate the JWTs.
+      N8N_USER_MANAGEMENT_JWT_SECRET: n8n
+      # See https://github.com/n8n-io/n8n/blob/40de4ed91c00fa366c131363363729592d1ab57a/packages/cli/src/services/public-api-key.service.ts#L19
+      N8N_API_KEY_AUDIENCE: public-api
+      # See https://github.com/n8n-io/n8n/blob/40de4ed91c00fa366c131363363729592d1ab57a/packages/cli/src/services/public-api-key.service.ts#L20
+      N8N_API_KEY_ISSUER: n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ../n8n:/home/node/.n8n/host-data
+      - ./n8n:/usr/local/lib/node_modules/n8n/host-data:ro
+      - ./n8n-local-files:/files
+
+volumes:
+  n8n_data:

@@ -1,0 +1,9 @@
+/*
+
+!/.git*
+!/.env.example
+!/README.md
+
+!/.local/
+!/n8n/
+!/supabase/

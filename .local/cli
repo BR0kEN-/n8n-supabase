@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e
+
+# ------------------------------------------------------------------------------
+# Core functions.
+# ------------------------------------------------------------------------------
+
+resolve_path() {
+    # Handle the symlink.
+    if [[ -L "$1" ]]; then
+        # The `realpath` or `readlink` are not used as they may
+        # be missing or differ per `*nix` distros (GNU, BSD).
+        awk -F ' -> ' '{print $2}' < <(ls -l "$1")
+    else
+        echo "$1"
+    fi
+}
+
+include_util() {
+    # shellcheck disable=SC1090
+    source "$SELF_DIR/utils/$1.sh"
+}
+
+# ------------------------------------------------------------------------------
+# Boot.
+# ------------------------------------------------------------------------------
+
+# Go to the script directory.
+cd "$(dirname "$(resolve_path "${BASH_SOURCE[0]}")")"
+SELF_DIR="$(pwd -P)"
+
+# ------------------------------------------------------------------------------
+# Run.
+# ------------------------------------------------------------------------------
+
+include_util boot
+include_util functions
+include_util before-command
+run_command "$@"

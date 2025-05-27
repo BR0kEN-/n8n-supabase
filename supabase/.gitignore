@@ -1,0 +1,9 @@
+/*
+
+!/.gitignore
+!/config.toml.tpl
+!/*.sql
+
+!/migrations/
+/migrations/*
+!/migrations/*.sql
