@@ -5,6 +5,8 @@ api:
 sources:
   docker_host:
     type: docker_logs
+    # Works as `starts_with` or `equals`.
+    # https://vector.dev/docs/reference/configuration/sources/docker_logs/#exclude_containers
     exclude_containers:
       - supabase-vector
 
@@ -30,13 +32,13 @@ transforms:
     inputs:
       - project_logs
     route:
-      kong: '.appname == "supabase-kong"'
-      auth: '.appname == "supabase-auth"'
-      rest: '.appname == "supabase-rest"'
-      realtime: '.appname == "supabase-realtime"'
-      storage: '.appname == "supabase-storage"'
-      functions: '.appname == "supabase-functions"'
-      db: '.appname == "supabase-db"'
+      kong: 'starts_with("supabase-kong--", string!(.appname))'
+      auth: 'starts_with("supabase-auth--", string!(.appname))'
+      rest: 'starts_with("supabase-rest--", string!(.appname))'
+      realtime: 'starts_with("supabase-realtime--", string!(.appname))'
+      storage: 'starts_with("supabase-storage--", string!(.appname))'
+      functions: 'starts_with("supabase-functions--", string!(.appname))'
+      db: 'starts_with("supabase-db--", string!(.appname))'
   # Ignores non nginx errors since they are related with kong booting up
   kong_logs:
     type: remap

@@ -134,6 +134,7 @@ services:
   ## Secure Realtime routes
   - name: realtime-v1-ws
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    # @todo: might require attention as the container name changed!
     url: http://realtime-dev.supabase-realtime:4000/socket
     protocol: ws
     routes:
@@ -154,6 +155,7 @@ services:
             - anon
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    # @todo: might require attention as the container name changed!
     url: http://realtime-dev.supabase-realtime:4000/api
     protocol: http
     routes:
