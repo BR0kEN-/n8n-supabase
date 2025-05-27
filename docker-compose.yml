@@ -1,6 +1,6 @@
 services:
   traefik:
-    container_name: traefik
+    container_name: "traefik--$COMPOSE_PROJECT_NAME"
     image: traefik
     restart: always
     command:
@@ -19,7 +19,7 @@ services:
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
 
   n8n:
-    container_name: n8n
+    container_name: "n8n--$COMPOSE_PROJECT_NAME"
     image: docker.n8n.io/n8nio/n8n
     restart: always
     labels:
@@ -49,7 +49,7 @@ services:
       - ./local-files:/files
 
   studio:
-    container_name: supabase-studio
+    container_name: "supabase-studio--$COMPOSE_PROJECT_NAME"
     image: supabase/studio:2025.05.19-sha-3487831
     restart: unless-stopped
     healthcheck:
@@ -89,7 +89,7 @@ services:
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
   kong:
-    container_name: supabase-kong
+    container_name: "supabase-kong--$COMPOSE_PROJECT_NAME"
     image: kong:2.8.1
     restart: unless-stopped
     labels:
@@ -120,7 +120,7 @@ services:
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
 
   auth:
-    container_name: supabase-auth
+    container_name: "supabase-auth--$COMPOSE_PROJECT_NAME"
     image: supabase/gotrue:v2.172.1
     restart: unless-stopped
     healthcheck:
@@ -170,8 +170,8 @@ services:
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
-      GOTRUE_SMTP_HOST: ${SMTP_HOST}
-      GOTRUE_SMTP_PORT: ${SMTP_PORT}
+      GOTRUE_SMTP_HOST: "$COMPOSE_PROJECT_NAME-supabase-mail"
+      GOTRUE_SMTP_PORT: 2500
       GOTRUE_SMTP_USER: ${SMTP_USER}
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
       GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
@@ -203,7 +203,7 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
 
   rest:
-    container_name: supabase-rest
+    container_name: "supabase-rest--$COMPOSE_PROJECT_NAME"
     image: postgrest/postgrest:v12.2.12
     restart: unless-stopped
     depends_on:
@@ -227,7 +227,7 @@ services:
 
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
-    container_name: realtime-dev.supabase-realtime
+    container_name: "realtime-dev.supabase-realtime--$COMPOSE_PROJECT_NAME"
     image: supabase/realtime:v2.34.47
     restart: unless-stopped
     depends_on:
@@ -271,7 +271,7 @@ services:
       RUN_JANITOR: true
 
   storage:
-    container_name: supabase-storage
+    container_name: "supabase-storage--$COMPOSE_PROJECT_NAME"
     image: supabase/storage-api:v1.22.17
     restart: unless-stopped
     volumes:
@@ -314,7 +314,7 @@ services:
       IMGPROXY_URL: http://imgproxy:5001
 
   imgproxy:
-    container_name: supabase-imgproxy
+    container_name: "supabase-imgproxy--$COMPOSE_PROJECT_NAME"
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
@@ -336,7 +336,7 @@ services:
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
 
   meta:
-    container_name: supabase-meta
+    container_name: "supabase-meta--$COMPOSE_PROJECT_NAME"
     image: supabase/postgres-meta:v0.89.0
     restart: unless-stopped
     depends_on:
@@ -354,7 +354,7 @@ services:
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   functions:
-    container_name: supabase-edge-functions
+    container_name: "supabase-edge-functions--$COMPOSE_PROJECT_NAME"
     image: supabase/edge-runtime:v1.67.4
     restart: unless-stopped
     volumes:
@@ -378,7 +378,7 @@ services:
       ]
 
   analytics:
-    container_name: supabase-analytics
+    container_name: "supabase-analytics--$COMPOSE_PROJECT_NAME"
     image: supabase/logflare:1.12.0
     restart: unless-stopped
     ports:
@@ -426,7 +426,7 @@ services:
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
-    container_name: supabase-db
+    container_name: "supabase-db--$COMPOSE_PROJECT_NAME"
     image: supabase/postgres:15.8.1.060
     restart: unless-stopped
     volumes:
@@ -483,7 +483,7 @@ services:
       ]
 
   vector:
-    container_name: supabase-vector
+    container_name: "supabase-vector--$COMPOSE_PROJECT_NAME"
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     volumes:
@@ -514,7 +514,7 @@ services:
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
-    container_name: supabase-pooler
+    container_name: "supabase-pooler--$COMPOSE_PROJECT_NAME"
     image: supabase/supavisor:2.5.1
     restart: unless-stopped
     ports:
