@@ -1,5 +1,6 @@
 # N8N + Supabase
 
+- All credentials in `.env`.
 - The `APP_PORT` is where the app is run on `127.0.0.1` (defaults to `8010`, change it when multiple apps needed).
 - The Supabase instance is at `https://127.0.0.1:$APP_PORT/` (no support to run at a path prefix).
 - The N8N instance is at `https://127.0.0.1:$APP_PORT/n8n`.
@@ -9,10 +10,21 @@
 
 ## Usage
 
+- Always use N8N and Supabase via `HTTPS`.
+- To run a webhook from CLI, bypass self-signed cert with `-k` or `--insecure` option. E.g. `curl -k https://127.0.0.1:8010/n8n/webhook-test/21cf827d-4da0-4b90-ab1d-c95c438da026`.
+
+### Commands
+
+One-time init
+
+```bash
+cp .env.example .env
+```
+
 Start
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
 Stop
@@ -20,3 +32,7 @@ Stop
 ```bash
 docker compose down
 ```
+
+## Todo
+
+- Search the codebase for `@todo`.
