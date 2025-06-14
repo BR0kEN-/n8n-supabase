@@ -43,6 +43,8 @@ _get_app_config() {
     local VARVALUE
     local CONFIG=(
         "N8N URL: http://127.0.0.1:$COMPOSE_APP_PORT/$N8N_URL_PREFIX"
+        "N8N Owner Email: $N8N_OWNER_EMAIL"
+        "N8N Owner Password: $N8N_OWNER_PASSWORD"
     )
 
     while read -r LINE; do
