@@ -28,7 +28,7 @@ _compute_port() {
     # free. Find the next available otherwise.
     _export_and_store \
         "$VARIABLE" \
-        "$(find_next_free_port "127.0.0.1" "$VALUE")"
+        "$(find_next_free_port "$ADDR_LOCALHOST" "$VALUE")"
 }
 
 if ! is_project_stack_running; then

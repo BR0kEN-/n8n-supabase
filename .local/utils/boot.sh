@@ -24,6 +24,7 @@ _ensure_env .
 # shellcheck disable=SC2034
 read -r COMPOSE_PROJECT_NAME < <(sed 's/[^-_a-z0-9]//g' < <(basename "$PWD"))
 
+export ADDR_LOCALHOST="127.0.0.1"
 # Either the default one or computed and stored in the `.env`.
 export UI_APP_PORT="${UI_APP_PORT:-8100}"
 export COMPOSE_APP_PORT="${COMPOSE_APP_PORT:-54100}"
