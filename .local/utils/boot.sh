@@ -25,6 +25,8 @@ _ensure_env .
 read -r COMPOSE_PROJECT_NAME < <(sed 's/[^-_a-z0-9]//g' < <(basename "$PWD"))
 
 export ADDR_LOCALHOST="127.0.0.1"
+export N8N_OWNER_EMAIL="node.mation+localhost@local.com"
+export N8N_OWNER_PASSWORD="n8nAdmin@123"
 # Either the default one or computed and stored in the `.env`.
 export UI_APP_PORT="${UI_APP_PORT:-8100}"
 export COMPOSE_APP_PORT="${COMPOSE_APP_PORT:-54100}"

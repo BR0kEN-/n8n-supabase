@@ -211,7 +211,6 @@ async function n8nIsReady() {
  * @return {Promise<string>}
  */
 async function getOwnerUuid() {
-  // The N8N creates a user entry by default but all values are empty.
   let owner = await sqliteGet(
     'SELECT * FROM user WHERE role = $role',
     {
@@ -219,15 +218,16 @@ async function getOwnerUuid() {
     },
   )
 
+  // The N8N creates a user entry by default but all values are empty.
   if (!owner.email) {
     const response = await httpN8nRequest(
       {
         path: '/rest/owner/setup',
         data: {
           email: N8N_OWNER_EMAIL,
+          password: N8N_OWNER_PASSWORD,
           firstName: 'Node',
           lastName: 'Mation',
-          password: N8N_OWNER_PASSWORD,
         },
       },
     )

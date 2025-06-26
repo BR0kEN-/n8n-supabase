@@ -27,6 +27,8 @@ _upenv() {
         DB_HOST_PORT="$(str_split_left "$DB_HOST_DETAILS" "/")"
 
         set_env "$DOTENV" N8N_URL "$N8N_URL"
+        set_env "$DOTENV" N8N_OWNER_EMAIL "$N8N_OWNER_EMAIL"
+        set_env "$DOTENV" N8N_OWNER_PASSWORD "$N8N_OWNER_PASSWORD"
         set_env "$DOTENV" SUPABASE_API_URL "$SUPABASE_API_URL"
         set_env "$DOTENV" SUPABASE_ANON_KEY "$SUPABASE_ANON_KEY"
         set_env "$DOTENV" SUPABASE_API_HOST "$(str_split_left "$SUPABASE_API_ORIGIN" ":")"
