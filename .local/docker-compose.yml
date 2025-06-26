@@ -32,6 +32,7 @@ services:
       N8N_PATH: "/$N8N_URL_PREFIX"
       N8N_PROTOCOL: http
       NODE_ENV: production
+      # noinspection HttpUrlsUsage
       WEBHOOK_URL: "http://$ADDR_LOCALHOST:$COMPOSE_APP_PORT/$N8N_URL_PREFIX"
       GENERIC_TIMEZONE: "$N8N_GENERIC_TIMEZONE"
       N8N_RUNNERS_ENABLED: true
