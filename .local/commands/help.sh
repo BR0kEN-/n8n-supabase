@@ -41,8 +41,14 @@ _lines_kv() {
 _get_app_config() {
     local VARNAME
     local VARVALUE
-    local CONFIG=(
-        "N8N URL: http://127.0.0.1:$COMPOSE_APP_PORT/$N8N_URL_PREFIX"
+    local CONFIG=()
+
+    # Read the real N8N URL.
+    # The `IFS='+'` is used to create exactly one entry in the `CONFIG`
+    # array as `+` is highly unlikely to meet in the URL.
+    IFS='+' read -ra CONFIG < <(docker exec "$COMPOSE_PROJECT_NAME--n8n" sh -c 'echo "N8N URL: $WEBHOOK_URL"')
+
+    CONFIG+=(
         "N8N Owner Email: $N8N_OWNER_EMAIL"
         "N8N Owner Password: $N8N_OWNER_PASSWORD"
     )
@@ -51,6 +57,8 @@ _get_app_config() {
         CONFIG+=("Supabase $LINE")
     done < <(npx supabase status 2>/dev/null)
 
+    # IMPORTANT! The variable label must be distinct as it's used to form
+    # the variable name.
     for ITEM in "${CONFIG[@]}"; do
         # Replace spaces with `_` and uppercase the label to make the variable name.
         read -r VARNAME < <(tr '[:lower:]' '[:upper:]' < <(sed "s@[[:space:]]@_@g" < <(str_split_left "$ITEM")))
@@ -62,7 +70,7 @@ _get_app_config() {
     _lines \
         "Notes" \
         echo \
-        "  - Use $(echo_green host.docker.internal) instead of the $(echo_yellow 127.0.0.1) in the N8N."
+        "  - Use $(echo_green host.docker.internal) instead of the $(echo_yellow "$ADDR_LOCALHOST") in the N8N."
 }
 
 _lines_kv "Commands" _command_name _command_help "$COMMANDS_DIR"/*.sh

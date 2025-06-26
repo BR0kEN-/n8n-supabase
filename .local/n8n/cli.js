@@ -22,6 +22,7 @@ const dataDir = `${configDir}/host-data`
 const command = process.argv[2]
 const db = new sqlite3.Database(`${configDir}/database.sqlite`)
 const {
+  ADDR_LOCALHOST,
   N8N_PORT,
   N8N_OWNER_EMAIL,
   N8N_OWNER_PASSWORD,
@@ -178,7 +179,7 @@ async function httpN8nRequest(options) {
     {
       method: 'POST',
       ...params,
-      hostname: '127.0.0.1',
+      hostname: ADDR_LOCALHOST,
       port: N8N_PORT,
       headers: {
         ...(params.headers || {}),

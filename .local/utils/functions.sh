@@ -293,6 +293,7 @@ run_n8n_command() {
     fi
 
     docker exec \
+        --env ADDR_LOCALHOST="$ADDR_LOCALHOST" \
         --env-file .env \
         --interactive \
         "$COMPOSE_PROJECT_NAME--n8n" \
