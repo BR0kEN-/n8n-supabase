@@ -2,7 +2,14 @@
 /**
  * @typedef {RequestOptions} HttpRequestOptions
  * @property {*} data
+ * @property {number} [retries=3]
+ * @property {(error: Error) => boolean} [retryOn]
  * @property {<T>(body: string) => T} [transform]
+ */
+
+/**
+ * @typedef {HttpRequestOptions} N8nHttpRequestOptions
+ * @property {string} [apiKey]
  */
 
 import { execSync } from 'node:child_process'
@@ -122,19 +129,19 @@ async function sqliteGet(query, params) {
  * @param {HttpRequestOptions} options
  */
 async function httpRequest(options) {
-  return new Promise((resolve, reject) => {
-    let { data, transform } = options
-    /** @type {HttpRequestOptions} */
-    const params = JSON.parse(JSON.stringify(options))
+  let { data, retryOn, retries, transform } = options
+  /** @type {HttpRequestOptions} */
+  const params = JSON.parse(JSON.stringify(options))
 
-    if (data && typeof data === 'object') {
-      data = JSON.stringify(data)
+  if (data && typeof data === 'object') {
+    data = JSON.stringify(data)
 
-      params.headers ??= {}
-      params.headers['Content-Type'] = 'application/json'
-      params.headers['Content-Length'] = Buffer.byteLength(data)
-    }
+    params.headers ??= {}
+    params.headers['Content-Type'] = 'application/json'
+    params.headers['Content-Length'] = Buffer.byteLength(data)
+  }
 
+  const make = () => new Promise((resolve, reject) => {
     const request = http.request(
       params,
       (response) => {
@@ -162,10 +169,36 @@ async function httpRequest(options) {
 
     request.end()
   })
+
+  if (retryOn) {
+    const retryTimes = retries ?? 3
+
+    for (let retry = 1; retry < retryTimes; retry++) {
+      try {
+        // Awaiting internally to assess the error.
+        return await make()
+      } catch (error) {
+        if (retryOn(error)) {
+          console.warn(
+            `Request failed, retrying (${retry} out of ${retryTimes})...`,
+            params,
+          )
+          // Give it some time to put itself together.
+          await sleep(300)
+        } else {
+          throw error
+        }
+      }
+    }
+  }
+
+  // The retries loop make one iteration less than requested when
+  // the `retryOn` is set. This call compensates the missing retry.
+  return make()
 }
 
 /**
- * @param {HttpRequestOptions & {apiKey?: string}} options
+ * @param {N8nHttpRequestOptions} options
  */
 async function httpN8nRequest(options) {
   const headers = {}
@@ -349,12 +382,20 @@ async function importN8nFiles(type, processFiles) {
 }
 
 async function importWorkflows(apiKey) {
+  const retryOn = (error) => {
+    return (
+      // At some point it fails with `socket hang up`.
+      error.code === 'ECONNRESET'
+    )
+  }
+
   for (const filePath of await importN8nFiles('workflows')) {
     const { id } = loadJsonFile(filePath)
     const workflow = await httpN8nRequest(
       {
         path: `/api/v1/workflows/${id}/activate`,
         apiKey,
+        retryOn,
       },
     )
 
