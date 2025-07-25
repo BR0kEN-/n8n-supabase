@@ -456,7 +456,11 @@ async function templateCredentialsFiles(filePaths) {
 }
 
 const commands = {
-  async configure(ownerApiKey) {
+  configure() {
+    // Exists only to ensure the owner account is configured (done
+    // by the logic that runs before any command).
+  },
+  async import(ownerApiKey) {
     await importN8nFiles('credentials', templateCredentialsFiles)
     await importWorkflows(ownerApiKey)
   },
