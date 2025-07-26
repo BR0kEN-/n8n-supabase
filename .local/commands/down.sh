@@ -18,9 +18,4 @@ if in_array "-v" "$@" || in_array "--volumes" "$@"; then
 fi
 
 npx supabase stop "${SUPABASE_ARGS[@]}"
-
-docker compose \
-    --file "$SELF_DIR/docker-compose.yml" \
-    --project-name "$COMPOSE_PROJECT_NAME" \
-    down \
-    "$@"
+run_command comdown
