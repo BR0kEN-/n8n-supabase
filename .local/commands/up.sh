@@ -69,13 +69,4 @@ if ! is_project_stack_running; then
 fi
 
 npx supabase start
-
-docker compose \
-    --file "$SELF_DIR/docker-compose.yml" \
-    --project-name "$COMPOSE_PROJECT_NAME" \
-    up \
-    --detach \
-    "$@"
-
-echo
-run_command upenv
+run_command comup
