@@ -29,7 +29,7 @@ services:
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"
     environment:
       N8N_PORT: 5678
-      N8N_PATH: "/$N8N_URL_PREFIX"
+      N8N_PATH: "/$N8N_URL_PREFIX/"
       N8N_PROTOCOL: http
       NODE_ENV: production
       # noinspection HttpUrlsUsage
