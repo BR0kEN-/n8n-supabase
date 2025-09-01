@@ -18,7 +18,7 @@ services:
 
   n8n:
     container_name: "$COMPOSE_PROJECT_NAME--n8n"
-    image: docker.n8n.io/n8nio/n8n:1.95.3
+    image: docker.n8n.io/n8nio/n8n
     restart: always
     labels:
       - "traefik.enable=true"
