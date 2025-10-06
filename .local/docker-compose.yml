@@ -51,6 +51,9 @@ services:
       N8N_API_KEY_AUDIENCE: public-api
       # See https://github.com/n8n-io/n8n/blob/40de4ed91c00fa366c131363363729592d1ab57a/packages/cli/src/services/public-api-key.service.ts#L20
       N8N_API_KEY_ISSUER: n8n
+      DB_SQLITE_POOL_SIZE: 1
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: false
+      N8N_GIT_NODE_DISABLE_BARE_REPOS: true
     volumes:
       - n8n_data:/home/node/.n8n
       - ../n8n:/home/node/.n8n/host-data
