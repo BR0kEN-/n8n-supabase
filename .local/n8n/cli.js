@@ -244,25 +244,15 @@ async function n8nIsReady() {
  * @return {Promise<string>}
  */
 async function getOwnerUuid() {
-  let owner
-
-  // Was `role`, turned into the `roleSlug`.
-  // https://github.com/n8n-io/n8n/pull/18768
-  for (const roleColumn of ['role', 'roleSlug']) {
-    try {
-      owner = await sqliteGet(
-        `SELECT * FROM user WHERE ${roleColumn} = $role`,
-        {
-          $role: 'global:owner',
-        },
-      )
-      break
-    } catch (error) {
-      if (!error.message.includes(`no such column: ${roleColumn}`)) {
-        throw error
-      }
+  let { data: owner } = await httpN8nRequest(
+    {
+      path: '/rest/login',
+      data: {
+        emailOrLdapLoginId: N8N_OWNER_EMAIL,
+        password: N8N_OWNER_PASSWORD,
+      },
     }
-  }
+  )
 
   // The N8N creates a user entry by default but all values are empty.
   if (!owner?.email) {
