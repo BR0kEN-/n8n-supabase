@@ -4,6 +4,7 @@
 !/.env.example
 !/cli
 !/docker-compose.yml
+!/lcl
 
 !/commands/
 /commands/*

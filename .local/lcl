@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# ------------------------------------------------------------------------------
+# Hello! I am a global adapter for any `n8n-supabase` projects. Forget the
+# relative path spec to the `./.local/cli` and use just `lcl` inside any
+# such project at any level of its directory tree.
+#
+# Install just once:
+# sudo ln -s "$(pwd -P)/.local/lcl" /usr/local/bin/lcl
+# ------------------------------------------------------------------------------
+
+set -e
+
+TARGET=".local/cli"
+# Assume initially that the current directory is a project root.
+PROJECT_DIR="$(pwd -P)"
+
+# Look for the typical structure of an `n8n-supabase` project.
+until [[ -f "$TARGET" ]]; do
+    # Oops, navigated to the root of the filesystem. That's it.
+    if [[ "$PROJECT_DIR" == "/" ]]; then
+        echo "==> [ERROR] No project found!"
+        exit 1
+    fi
+
+    # Navigate back to see whether a user is deep down
+    # inside the project tree.
+    cd ..
+    PROJECT_DIR="$(pwd -P)"
+done
+
+exec "$PROJECT_DIR/$TARGET" "$@"
