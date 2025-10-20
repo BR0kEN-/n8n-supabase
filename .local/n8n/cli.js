@@ -402,9 +402,13 @@ async function importWorkflows(apiKey) {
       },
     )
 
-    console.info(
-      `The workflow "${workflow.name}" set to ${workflow.active ? '' : 'in'}active.`,
-    )
+    if (workflow.message) {
+      console.error(workflow.message)
+    } else {
+      console.info(
+        `Workflow "${workflow.name}" (ID: ${workflow.id}) set to ${workflow.active ? '' : 'in'}active.`,
+      )
+    }
   }
 }
 
