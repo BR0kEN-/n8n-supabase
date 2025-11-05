@@ -6,4 +6,5 @@
 
 set -e
 
-run_n8n_command export
+echo_yellow 'DEPRECATED: use "n8n-ew" instead!'
+run_n8n_command export workflows
