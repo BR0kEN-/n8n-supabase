@@ -298,7 +298,7 @@ run_n8n_command() {
         --interactive \
         "$COMPOSE_PROJECT_NAME--n8n" \
         /usr/local/lib/node_modules/n8n/host-data/cli.js \
-        "$1"
+        "$@"
 }
 
 run_command() {

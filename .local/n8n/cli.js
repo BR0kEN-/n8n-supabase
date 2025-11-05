@@ -412,32 +412,86 @@ async function importWorkflows(apiKey) {
   }
 }
 
-async function exportWorkflows() {
-  const dir = `${dataDir}/workflows`
+/**
+ * @param {('workflows'|'credentials')} type
+ * @param {string[]} [ids]
+ */
+async function exportN8nFiles(type, ids) {
+  const dir = `${dataDir}/${type}`
+  // Singular word form.
+  const kind = type.slice(0, -1)
+  const command = type.endsWith('ws')
+    ? kind
+    : type
+  const args = (() => {
+    const list = [
+      '--separate',
+      // There's no way to own the filename.
+      `--output "${dir}"`,
+    ]
 
-  for (const path of globSync(`${dir}/*.json`)) {
-    const { id, name } = loadJsonFile(path)
+    if (type === 'credentials') {
+      list.unshift('--decrypted')
+    }
+
+    return list.join(' ')
+  })()
+  const fn = (id, filename) => {
     const exportFilePath = `${dir}/${id}.json`
 
     console.info(
-      `Exporting workflow "${name}"...`,
+      `Exporting ${kind} "${id}"...`,
     )
 
-    execSync(
-      // There's no way to own the filename.
-      `n8n export:workflow --separate --pretty --id "${id}" --output "${dir}"`,
-      {
-        stdio: 'inherit',
-      },
-    )
+    try {
+      execSync(
+        `n8n export:${command} ${args} --id "${id}"`,
+        {
+          stdio: 'inherit',
+        },
+      )
+    } catch {
+      // Command failed.
+      return
+    }
+
+    const data = loadJsonFile(exportFilePath)
 
     writeFileSync(
-      `${dir}/${basename(path)}`,
+      `${dir}/${filename || `${data.name}.json`}`,
       // Ensure the top-level keys are always in the same order.
-      JSON.stringify(sortObjectKeys(loadJsonFile(exportFilePath)), null, 2),
+      JSON.stringify(sortObjectKeys(data), null, 2),
     )
 
     rmSync(exportFilePath)
+  }
+
+  const filenames = globSync(`${dir}/*.json`).reduce(
+    (accumulator, path) => {
+      // Avoid parsing as the file can be a template
+      // with the handlebars syntax (invalid JSON).
+      const match = loadFile(path).match(/"id":\s+?"([^"]+)"/)
+
+      if (match) {
+        accumulator[match[1]] = basename(path)
+      } else {
+        console.error('Unable to find the "id" property inside', path)
+      }
+
+      return accumulator
+    },
+    {},
+  )
+
+  if (ids?.length) {
+    for (const id of ids) {
+      // Use the filename of an existing export if available.
+      fn(id, filenames[id])
+    }
+  } else {
+    for (const [id, filename] of Object.entries(filenames)) {
+      fn(id, filename)
+    }
   }
 }
 
@@ -472,7 +526,13 @@ const commands = {
     await importWorkflows(ownerApiKey)
   },
   async export() {
-    await exportWorkflows()
+    const type = process.argv[3]
+
+    if (!type) {
+      throw new Error('The entity type must be provided.')
+    }
+
+    await exportN8nFiles(type, process.argv.slice(4))
   },
 }
 
