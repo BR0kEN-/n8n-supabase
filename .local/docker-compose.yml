@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: "$COMPOSE_PROJECT_NAME--traefik"
-    image: traefik
+    image: traefik:latest
     restart: always
     command:
       - "--providers.docker=true"
