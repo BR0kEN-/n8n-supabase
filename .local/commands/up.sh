@@ -68,5 +68,5 @@ for VARIABLE in \
     replace_in_file "$SUPABASE_CONFIG_PATH" "env($VARIABLE)" "${!VARIABLE}"
 done
 
-npx supabase start
+run_command supabase start
 run_command comup

@@ -17,5 +17,5 @@ if in_array "-v" "$@" || in_array "--volumes" "$@"; then
     run_n8n_command export 1>/dev/null || true
 fi
 
-npx supabase stop "${SUPABASE_ARGS[@]}"
+run_command supabase stop "${SUPABASE_ARGS[@]}"
 run_command comdown
