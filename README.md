@@ -5,7 +5,9 @@ Provision a stack with N8N and Supabase for local development. Ensure the requir
 ## Requirements
 
 - Docker Desktop (Mac/Windows, no Linux operability tested).
-- [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) installed via NPX (run `npx supabase --help` and confirm the installation if missing).
+- [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) installed:
+  - project-wise via `npm install --save-dev supabase` (prefer this to control the CLI version for a specific project)
+  - globally via NPX (run `npx supabase --help` and confirm the installation if missing)
 
 ## Commands
 

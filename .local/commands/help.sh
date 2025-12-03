@@ -32,7 +32,7 @@ _lines_kv() {
     local VF="$3"
 
     _kv() {
-        printf '  %-40s %s\n' "$(echo_green "$("$KF" "$1")")" "$("$VF" "$1")"
+        printf '  %-50s %s\n' "$(echo_green "$("$KF" "$1")")" "$("$VF" "$1")"
     }
 
     _lines "$1" _kv "${@:4}"
@@ -46,16 +46,20 @@ _get_app_config() {
     # Read the real N8N URL.
     # The `IFS='+'` is used to create exactly one entry in the `CONFIG`
     # array as `+` is highly unlikely to meet in the URL.
-    IFS='+' read -ra CONFIG < <(docker exec "$COMPOSE_PROJECT_NAME--n8n" sh -c 'echo "N8N URL: $WEBHOOK_URL"')
+    IFS='+' read -ra CONFIG < <(docker exec "$COMPOSE_PROJECT_NAME--n8n" sh -c 'echo "N8N_URL: $WEBHOOK_URL"')
 
     CONFIG+=(
-        "N8N Owner Email: $N8N_OWNER_EMAIL"
-        "N8N Owner Password: $N8N_OWNER_PASSWORD"
+        "N8N_OWNER_EMAIL: $N8N_OWNER_EMAIL"
+        "N8N_OWNER_PASSWORD: $N8N_OWNER_PASSWORD"
     )
 
     while read -r LINE; do
-        CONFIG+=("Supabase $LINE")
-    done < <(npx supabase status 2>/dev/null)
+        K="$(str_split_left "$LINE" =)"
+        V="$(str_split_right "$LINE" =)"
+        V="${V%\"}" # strip the trailing quote
+        V="${V#\"}" # strip the leading quote
+        CONFIG+=("SUPABASE_$K: $V")
+    done < <(run_command supabase status --output env 2>/dev/null)
 
     # IMPORTANT! The variable label must be distinct as it's used to form
     # the variable name.
